@@ -4,8 +4,36 @@ import ImageHawaii from '../../../assets/images/hawaiian.jpg';
 import ImageBacon from '../../../assets/images/bacon.jpg';
 
 import {Col, Row, Card, CardBody, CardFooter, Button} from 'reactstrap';
+var gPizzaType = "";
 
-function PizzaType() {
+function PizzaType({changeTypeHandler}) {
+    const onBtnSeaFoodClick = () => {
+        // change button color
+        document.getElementById("btn-sea-food").className = "btn btn-success w-100";
+        document.getElementById("btn-hawaii").className = "btn btn-warning w-100";
+        document.getElementById("btn-bacon").className = "btn btn-warning w-100";
+        gPizzaType = "SeaFood";  
+        changeTypeHandler(gPizzaType);      
+    }
+
+    const onBtnHawaiiClick = () => {
+        // change button color
+        document.getElementById("btn-sea-food").className = "btn btn-warning w-100";
+        document.getElementById("btn-hawaii").className = "btn btn-success w-100";
+        document.getElementById("btn-bacon").className = "btn btn-warning w-100";
+        gPizzaType = "Hawaii";  
+        changeTypeHandler(gPizzaType);      
+    }
+
+    const onBtnBaconClick = () => {
+        // change button color
+        document.getElementById("btn-sea-food").className = "btn btn-warning w-100";
+        document.getElementById("btn-hawaii").className = "btn btn-warning w-100";
+        document.getElementById("btn-bacon").className = "btn btn-success w-100";
+        gPizzaType = "Bacon";  
+        changeTypeHandler(gPizzaType);      
+    }
+    
     return(
         <Col sm='12'>
             <Row id='pizza-type'>
@@ -26,7 +54,7 @@ function PizzaType() {
                                     <p>Xốt cà chua, phô mai Mozzarella, tôm, mực, thanh cua, hành tây.</p>
                                 </CardBody>
                                 <CardFooter className='text-center'>
-                                    <Button className='w-100' color='warning' id='btn-sea-food'>Chọn</Button>
+                                    <Button className='w-100' color='warning' id='btn-sea-food' onClick={onBtnSeaFoodClick}>Chọn</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
@@ -40,7 +68,7 @@ function PizzaType() {
                                         <p>Xốt cà chua, phô mai Mozzarella, thịt dăm bông, thơm.</p><br></br>
                                 </CardBody>
                                 <CardFooter className='text-center'>
-                                    <Button className='w-100' color='warning' id='btn-sea-food'>Chọn</Button>
+                                    <Button className='w-100' color='warning' id='btn-hawaii' onClick={onBtnHawaiiClick}>Chọn</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
@@ -54,7 +82,7 @@ function PizzaType() {
                                         <p>Xốt phô mai, thịt gà, thịt heo muối, phô mai Mozzarella, cà chua.</p>
                                 </CardBody>
                                 <CardFooter className='text-center'>
-                                    <Button className='w-100' color='warning' id='btn-sea-food'>Chọn</Button>
+                                    <Button className='w-100' color='warning' id='btn-bacon' onClick={onBtnBaconClick}>Chọn</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
