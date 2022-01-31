@@ -1,6 +1,103 @@
 import {Col, Row, Card, CardHeader, CardBody, CardFooter, ListGroup, ListGroupItem, Button} from 'reactstrap';
 
-function MenuSize() {
+var gSelectedMenu = {
+    menuName: "",    // S(small), M(medium), L(large)
+    duongKinhCM: 0,
+    suonNuong: 0,
+    saladGr: 0,
+    drink: 0,
+    priceVND: 0
+}
+// save menu detail in JSON format
+const gMENU_DETAILS_JSON = `[
+    { "size" : "S(small)",
+      "detail" : {
+          "duongKinh" : "20",
+          "suonNuong" : "2",
+          "salad": "200",
+          "soLuongNuoc": "2",
+          "VND": "150000"
+      }
+    },
+    { "size" : "M(medium)",
+      "detail" : {
+        "duongKinh" : "25",
+        "suonNuong" : "4",
+        "salad": "300",
+        "soLuongNuoc": "3",
+        "VND": "200000"
+      }
+    },
+    { "size" : "L(large)",
+      "detail" : {
+        "duongKinh" : "30",
+        "suonNuong" : "8",
+        "salad": "500",
+        "soLuongNuoc": "4",
+        "VND": "250000"
+      }
+    }
+]`
+var gMenuDetailObj = JSON.parse(gMENU_DETAILS_JSON);
+
+// function to get menu detail
+// input: paramMenuSize - size of selected menu
+// output: save all detail of selected menu
+function getMenuDetail(paramMenuSize) {
+    var vMenuFound = false;
+    var vIterator = 0;
+    gSelectedMenu.menuName = paramMenuSize;
+    while (!vMenuFound && vIterator < gMenuDetailObj.length) {
+      if (paramMenuSize === gMenuDetailObj[vIterator].size) {
+        vMenuFound = true;
+        var vMenuDetail = gMenuDetailObj[vIterator].detail;
+        gSelectedMenu.duongKinhCM = vMenuDetail.duongKinh;
+        gSelectedMenu.suonNuong = vMenuDetail.suonNuong;
+        gSelectedMenu.saladGr = vMenuDetail.salad;
+        gSelectedMenu.drink = vMenuDetail.soLuongNuoc;
+        gSelectedMenu.priceVND = vMenuDetail.VND;
+      }
+      else vIterator++;
+    }
+}
+
+function MenuSize({changeMenuHandler}) {
+    const onBtnSmallMenuClick = () => {
+        // change button color
+        document.getElementById("btn-small").className = 'btn btn-success w-100';
+        document.getElementById("btn-medium").className = 'btn btn-warning w-100';
+        document.getElementById("btn-large").className = 'btn btn-warning w-100';
+
+        let selectedSize = "S(small)";
+        getMenuDetail(selectedSize);
+        //console.log(gSelectedMenu);
+        changeMenuHandler(gSelectedMenu);
+    }
+
+    const onBtnMediumMenuClick = () => {
+        // change button color
+        document.getElementById("btn-small").className = 'btn btn-warning w-100';
+        document.getElementById("btn-medium").className = 'btn btn-success w-100';
+        document.getElementById("btn-large").className = 'btn btn-warning w-100';
+
+        let selectedSize = "M(medium)";
+        getMenuDetail(selectedSize);
+        //console.log(gSelectedMenu);        
+        changeMenuHandler(gSelectedMenu);
+    }
+
+    const onBtnLargeMenuClick = () => {
+        // change button color
+        document.getElementById("btn-small").className = 'btn btn-warning w-100';
+        document.getElementById("btn-medium").className = 'btn btn-warning w-100';
+        document.getElementById("btn-large").className = 'btn btn-success w-100';
+
+        let selectedSize = "L(large)";
+        getMenuDetail(selectedSize);
+        //console.log(gSelectedMenu);
+        changeMenuHandler(gSelectedMenu);
+    }
+
     return(
         <Col sm='12'>
             <Row id='combo'>
@@ -28,7 +125,7 @@ function MenuSize() {
                                     </ListGroup>
                                 </CardBody>   
                                 <CardFooter className='text-center'>                                   
-                                    <Button color='warning' id='btn-small' className='w-100'>Chọn</Button>
+                                    <Button color='warning' id='btn-small' className='w-100' onClick={onBtnSmallMenuClick}>Chọn</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
@@ -48,7 +145,7 @@ function MenuSize() {
                                     </ListGroup>
                                 </CardBody>   
                                 <CardFooter className='text-center'>                                   
-                                    <Button color='warning' id='btn-medium' className='w-100'>Chọn</Button>
+                                    <Button color='warning' id='btn-medium' className='w-100' onClick={onBtnMediumMenuClick}>Chọn</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
@@ -68,7 +165,7 @@ function MenuSize() {
                                     </ListGroup>
                                 </CardBody>   
                                 <CardFooter className='text-center'>                                   
-                                    <Button color='warning' id='btn-large' className='w-100'>Chọn</Button>
+                                    <Button color='warning' id='btn-large' className='w-100' onClick={onBtnLargeMenuClick}>Chọn</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
