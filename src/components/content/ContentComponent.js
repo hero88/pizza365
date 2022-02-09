@@ -36,7 +36,7 @@ function validateOrder(paramMenuName, paramOrder, paramPizzaType, paramDrink) {
 
     // check email
     var vEmail = paramOrder.email;
-    var vCharsInEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    var vCharsInEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (vCharsInEmail.test(vEmail) === false){
         alert("Email nhập sai !");
         return false;
@@ -52,27 +52,8 @@ function validateOrder(paramMenuName, paramOrder, paramPizzaType, paramDrink) {
     if (!paramOrder.address) {    
       alert("Chưa nhập địa chỉ !");
       return false;
-    }
-
-    // nếu không nhập voucherID thì ghi none
-    if (!paramOrder.voucherID) {
-        paramOrder.voucherID = "none";
-        paramOrder.discountPercent = 0;
-    }
-    else {
-        // find voucher detail information    
-        let vBaseUrl = "http://42.115.221.44:8080/devcamp-voucher-api/voucher_detail/";
-        fetchApi(vBaseUrl + paramOrder.voucherID)
-            .then((data) => {
-                paramOrder.discountPercent = data.phanTramGiamGia;                
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Mã giảm giá sai rồi !");                
-            }) 
-        if (paramOrder.discountPercent === 0) return false;
-    }
-
+    } 
+    
     // done checking
     return true;
 }
@@ -84,7 +65,7 @@ function totalPrice(paramPrice, paramDiscount){
     return paramPrice * (100 - paramDiscount) / 100 ;
 }
 
-function ContentComponent() {    
+function ContentComponent() {       
     const [selectedMenu, setSelectedMenu] = useState({});   
     const [selectedType, setSelectedType] = useState(""); 
     const [selectedDrink, setSelectedDrink] = useState("");
@@ -95,7 +76,8 @@ function ContentComponent() {
     const [voucher, setVoucher] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
-    const [detail, setDetail] = useState("");
+    const [detail, setDetail] = useState("");     
+    const [discountP, setDiscountP] = useState(0);  
 
     const [modalDisplay, setModalDisplay] = useState(false);
     const toggleModal = () => {
@@ -115,7 +97,8 @@ function ContentComponent() {
         setSelectedDrink(paramDrink);
     }
 
-    const onBtnSendOrder = (e) => {  
+    const onBtnSendOrder = () => {  
+        console.log("Click gửi đơn!");
         let customerObj = {
             fullName: name.trim(),
             email: email.trim(),
@@ -123,54 +106,72 @@ function ContentComponent() {
             address: address.trim(),
             message: message.trim(),
             voucherID: voucher.trim(),
-            discountPercent: 0
+            discountPercent: discountP
         }
-        let isValidated = validateOrder(selectedMenu.menuName, customerObj, selectedType, selectedDrink);
+        let isValidated = validateOrder(selectedMenu.menuName, customerObj, selectedType, selectedDrink);        
+        
         if (isValidated){
-            console.log("Done Order Validation!");
-            console.log(customerObj);                             
-            let vTextAreaDetail = "Xác nhận: " + customerObj.fullName + ", " + customerObj.phone + ", " + customerObj.address
-                        + "\nMenu: " + selectedMenu.menuName + ", sườn nướng: " + selectedMenu.suonNuong + ", loại nước: " + selectedDrink 
-                        + ", số lượng nước: " + selectedMenu.drink
-                        + ", " + selectedMenu.saladGr + "g salad, "
-                        + "\nLoại pizza: " + selectedType + ", giá: " + selectedMenu.priceVND + "vnd, Mã giảm giá: " + customerObj.voucherID
-                        + "\nPhải thanh toán: " + totalPrice(selectedMenu.priceVND, customerObj.discountPercent) + "vnd (giảm giá " + customerObj.discountPercent + "%)";         
-            setDetail(vTextAreaDetail);
-            setModalDisplay(true);  
+            let toContinue = true;
+            if (customerObj.voucherID.length > 0) {                
+                if (customerObj.discountPercent === 0 ) {
+                    toContinue = false;   
+                    alert("Mã giảm giá sai rồi!");
+                }                                 
+            }
+            if (toContinue) {
+                console.log("Done Order Validation!");
+                console.log(customerObj);              
+                            
+                let vTextAreaDetail = "Xác nhận: " + customerObj.fullName + ", " + customerObj.phone + ", " + customerObj.address
+                            + "\nMenu: " + selectedMenu.menuName + ", sườn nướng: " + selectedMenu.suonNuong + ", loại nước: " + selectedDrink 
+                            + ", số lượng nước: " + selectedMenu.drink
+                            + ", " + selectedMenu.saladGr + "g salad, "
+                            + "\nLoại pizza: " + selectedType + ", giá: " + selectedMenu.priceVND + "vnd, Mã giảm giá: " + customerObj.voucherID
+                            + "\nPhải thanh toán: " + totalPrice(selectedMenu.priceVND, customerObj.discountPercent) + "vnd (giảm giá " + customerObj.discountPercent + "%)";         
+                setDetail(vTextAreaDetail);
+                setModalDisplay(true);  
+            }
+            
         }        
     }
 
-    const onBtnCreateOrder = () => {        
-        // get discount percent from server
-        fetchApi("http://42.115.221.44:8080/devcamp-voucher-api/voucher_detail/" + voucher)
-            .then((data) => {                
-                let discount = data.phanTramGiamGia;
-                let vObjectRequest = {
-                    kichCo: selectedMenu.menuName,
-                    duongKinh: selectedMenu.duongKinhCM,
-                    suon: selectedMenu.suonNuong,
-                    salad: selectedMenu.saladGr,
-                    loaiPizza: selectedType,
-                    idVourcher: voucher,
-                    idLoaiNuocUong: selectedDrink,
-                    soLuongNuoc: selectedMenu.drink,
-                    hoTen: name,
-                    thanhTien: totalPrice(selectedMenu.priceVND, discount),
-                    email: email,
-                    soDienThoai: phone,
-                    diaChi: address,
-                    loiNhan: message
-                }
-                let body = {
-                    method: 'POST',
-                    body: JSON.stringify(vObjectRequest),               
-                    headers: {
-                      'Content-type': 'application/json; charset=UTF-8',
-                    },
-                }
-                
-                // call server to create order
-                fetchApi("http://42.115.221.44:8080/devcamp-pizza365/orders", body)
+    const onBtnCreateOrder = () => {   
+        console.log("Click send order!")
+        let discount = 0;     
+        if (voucher.length > 0) {
+            // get discount percent from server
+            fetchApi("http://42.115.221.44:8080/devcamp-voucher-api/voucher_detail/" + voucher)
+                .then((data) => {                
+                    discount = data.phanTramGiamGia;             
+                })
+                .catch((error) => console.log(error))
+        }
+
+        let vObjectRequest = {
+            kichCo: selectedMenu.menuName,
+            duongKinh: selectedMenu.duongKinhCM,
+            suon: selectedMenu.suonNuong,
+            salad: selectedMenu.saladGr,
+            loaiPizza: selectedType,
+            idVourcher: voucher,
+            idLoaiNuocUong: selectedDrink,
+            soLuongNuoc: selectedMenu.drink,
+            hoTen: name,
+            thanhTien: totalPrice(selectedMenu.priceVND, discount),
+            email: email,
+            soDienThoai: phone,
+            diaChi: address,
+            loiNhan: message
+        }
+        let body = {
+            method: 'POST',
+            body: JSON.stringify(vObjectRequest),               
+            headers: {
+              'Content-type': 'application/json; charset=UTF-8',
+            },
+        }                
+        // call server to create order
+        fetchApi("http://42.115.221.44:8080/devcamp-pizza365/orders", body)
                     .then((data) => {
                         console.log(data);
                         alert("Cám ơn bạn đã đặt hàng tại Pizza 365. Mã đơn hàng của bạn là: " + data.orderId);
@@ -179,18 +180,24 @@ function ContentComponent() {
                     .catch((error) => {
                         console.log(error);
                     })
-            })
-            .catch((error) => {
-                console.log(error);
-        })        
+                   
 
     }
 
     useEffect(() => {
         console.log("selected Menu= " + selectedMenu.menuName);
         console.log("selected Type= " + selectedType);
-        console.log("selected Drink= " + selectedDrink);                
-    }, [selectedMenu, selectedDrink, selectedType]);    
+        console.log("selected Drink= " + selectedDrink); 
+        let vBaseUrl = "http://42.115.221.44:8080/devcamp-voucher-api/voucher_detail/";
+                fetchApi(vBaseUrl + voucher)
+                .then((data) => {                            
+                    setDiscountP(data.phanTramGiamGia);    
+                })
+                .catch((error) => {
+                    console.log(error);
+                    setDiscountP(0);                                                                     
+                })                
+    }, [selectedMenu, selectedDrink, selectedType, voucher]);    
     
     return(
     <>
