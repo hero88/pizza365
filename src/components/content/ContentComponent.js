@@ -136,16 +136,7 @@ function ContentComponent() {
     }
 
     const onBtnCreateOrder = () => {   
-        console.log("Click send order!")
-        let discount = 0;     
-        if (voucher.length > 0) {
-            // get discount percent from server
-            fetchApi("http://42.115.221.44:8080/devcamp-voucher-api/voucher_detail/" + voucher)
-                .then((data) => {                
-                    discount = data.phanTramGiamGia;             
-                })
-                .catch((error) => console.log(error))
-        }
+        console.log("Click send order!");        
 
         let vObjectRequest = {
             kichCo: selectedMenu.menuName,
@@ -157,7 +148,7 @@ function ContentComponent() {
             idLoaiNuocUong: selectedDrink,
             soLuongNuoc: selectedMenu.drink,
             hoTen: name,
-            thanhTien: totalPrice(selectedMenu.priceVND, discount),
+            thanhTien: selectedMenu.priceVND,
             email: email,
             soDienThoai: phone,
             diaChi: address,
@@ -189,7 +180,8 @@ function ContentComponent() {
         console.log("selected Type= " + selectedType);
         console.log("selected Drink= " + selectedDrink); 
         let vBaseUrl = "http://42.115.221.44:8080/devcamp-voucher-api/voucher_detail/";
-                fetchApi(vBaseUrl + voucher)
+        if (voucher)
+            fetchApi(vBaseUrl + voucher)
                 .then((data) => {                            
                     setDiscountP(data.phanTramGiamGia);    
                 })
