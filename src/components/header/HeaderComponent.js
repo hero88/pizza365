@@ -12,13 +12,13 @@ function HeaderComponent() {
                                 <a className="nav-link" href="/">Trang chủ<span className="sr-only"></span></a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#combo">Combo</a>
+                                <a className="nav-link" href="/#combo">Combo</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#pizza-type">Loại Pizza</a>
+                                <a className="nav-link" href="/#pizza-type">Loại Pizza</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#send-order">Gửi đơn hàng</a>
+                                <a className="nav-link" href="/#send-order">Gửi đơn hàng</a>
                             </li>
                         </ul>
                     </nav>
