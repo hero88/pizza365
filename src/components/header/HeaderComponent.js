@@ -20,6 +20,9 @@ function HeaderComponent() {
                             <li className="nav-item">
                                 <a className="nav-link" href="/#send-order">Gửi đơn hàng</a>
                             </li>
+                            <li className="nav-item">
+                                <a className="nav-link" href="/orderlist">Danh sách đơn hàng</a>
+                            </li>
                         </ul>
                     </nav>
                 </Col>

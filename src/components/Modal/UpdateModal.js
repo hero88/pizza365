@@ -43,7 +43,7 @@ function UpdateModal({update, setUpdate, order}) {
             toast.success("Cập nhật đơn hàng thành công !");
             handleClose();
         })
-        .catch((err)=> toast(err))
+        .catch((err)=> toast.error(err))
     }    
 
     return(
@@ -94,7 +94,7 @@ function UpdateModal({update, setUpdate, order}) {
                         <TextField InputProps={{readOnly: true}} fullWidth label="Mã giảm giá" value={order.idVourcher}/>
                     </Grid>
                     <Grid item xs={6}>
-                        <TextField InputProps={{readOnly: true}} fullWidth label="Loại nước uống" value={order.idLoaiNuocUong}/>
+                        <TextField InputProps={{readOnly: true}} fullWidth label="Loại nước uống" defaultValue={order.idLoaiNuocUong}/>
                     </Grid>
                     <Grid item xs={6}>
                         <TextField InputProps={{readOnly: true}} fullWidth label="Họ tên" value={order.hoTen}/>

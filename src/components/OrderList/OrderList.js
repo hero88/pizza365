@@ -16,7 +16,7 @@ function OrderList() {
     useEffect(() => {
         fetchApi("http://42.115.221.44:8080/devcamp-pizza365/orders/")
           .then((data)=>{
-            if (!filterObj) setOrder(data);
+            if (!filterObj || (filterObj.trangThai==="None" && filterObj.loaiPizza==="None")) setOrder(data);
             else {
               let vArray = data.filter(function(el){
                 if ((filterObj.trangThai !== "None") && (filterObj.loaiPizza !== "None")) // filter both pizza + combo
@@ -29,7 +29,7 @@ function OrderList() {
           })
           .catch((err) => console.log(err))
         
-    }, [filterObj]);
+    }, [filterObj, order]);
     return (
         <>
             <br/><br/>

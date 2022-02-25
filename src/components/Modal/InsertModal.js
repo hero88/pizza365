@@ -46,6 +46,43 @@ const gMENU_DETAILS_JSON = `[
 ]`
 var gMenuDetailObj = JSON.parse(gMENU_DETAILS_JSON);
 
+function validateOrder(paramObj) {
+    // check họ tên
+    if (!paramObj.hoTen) {
+        toast.error("Bạn chưa nhập họ tên !");
+        return false;
+    }
+
+    // check email
+    var vEmail = paramObj.email;
+    var vCharsInEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (vCharsInEmail.test(vEmail) === false){
+        toast.error("Email nhập sai !");
+        return false;
+    }
+
+    // check sdt
+    if (isNaN(paramObj.soDienThoai) || !paramObj.soDienThoai) {
+        toast.error("Bạn cần nhập đúng số điện thoại !");
+        return false;
+    }
+
+    // kiểm tra địa chỉ
+    if (!paramObj.diaChi) {    
+        toast.error("Chưa nhập địa chỉ !");
+        return false;
+    }
+  
+    // check drink
+    if (paramObj.idLoaiNuocUong === "None") {
+        toast.error("Bạn chưa chọn loại nước uống !");
+        return false;
+    }
+    
+    // done checking
+    return true;
+}
+
 function InsertModal({insert, setInsert}) {
     const [size, setSize] = useState("S");
     const [type, setType] = useState("hawaii");
@@ -71,6 +108,13 @@ function InsertModal({insert, setInsert}) {
     }
 
     const handleClose = () => setInsert(false);
+    const resetForm = () => {
+        setName("");
+        setPhone("");
+        setEmail("");
+        setAddress("");
+        setDrink("None");
+    }
 
     const changeSelectSize = e => setSize(e.target.value);       
     const changeSelectType = e => setType(e.target.value);  
@@ -100,24 +144,27 @@ function InsertModal({insert, setInsert}) {
             soDienThoai: phone,
             diaChi: address,
             loiNhan: message
+        };
+        let isValidated = validateOrder(vObjectRequest);
+        if (isValidated) {
+            let body = {
+                method: 'POST',
+                body: JSON.stringify(vObjectRequest),               
+                headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+                },
+            }                
+            // call server to create order
+            fetchApi("http://42.115.221.44:8080/devcamp-pizza365/orders", body)
+                        .then((data) => {                        
+                            toast.success("Tạo đơn hàng thành công! Mã đơn hàng là: " + data.orderId);
+                            resetForm();
+                            handleClose();
+                        })
+                        .catch((error) => {
+                            toast.error(error);
+                        })
         }
-        let body = {
-            method: 'POST',
-            body: JSON.stringify(vObjectRequest),               
-            headers: {
-              'Content-type': 'application/json; charset=UTF-8',
-            },
-        }                
-        // call server to create order
-        fetchApi("http://42.115.221.44:8080/devcamp-pizza365/orders", body)
-                    .then((data) => {                        
-                        toast.success("Tạo đơn hàng thành công! Mã đơn hàng là: " + data.orderId);
-                        handleClose();
-                    })
-                    .catch((error) => {
-                        toast.error(error);
-                    })
-
     }
 
     useEffect(()=>{        

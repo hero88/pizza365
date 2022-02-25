@@ -24,7 +24,7 @@ function DeleteModal({deleteModal, setDelete, order}){
     const handleClose = () => setDelete(false);
     const onBtnConfirmClick = () => {
         let body = { method: 'DELETE'};
-        let vId = order.id;
+        let vId = order.orderId;
         fetchApi("http://42.115.221.44:8080/devcamp-pizza365/orders/" + vId, body)
         .then(()=>{            
             toast.success("Bạn đã xóa thành công order mang id= " + vId);
